@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import sys
 import socket
 
@@ -26,5 +28,6 @@ def main():
   return
 ########## RUN MAIN ##########
 
-main()
+if __name__ == '__main__':
+    main()
 
