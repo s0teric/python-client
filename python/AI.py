@@ -1,17 +1,24 @@
-########## GameObjects.py ##########
+# -*- python -*-
+from BaseAI import BaseAI
+from GameObjects import *
 
-% for model in models
+class AI(BaseAI):
+  @staticmethod
+  def username():
+    return "Shell AI"
 
-#\
-#${model.doc}
-%    if model.parent:
-class ${model.name}(${model.parent.name}):
-%    else:
-class ${model.name}(GameObject):
-%    endif
+  @staticmethod
+  def password():
+    return "password"
 
-%    for datum in model.data:
-  def get${capitalize(datum.name)}(self):
-    return
+  def init(self):
+    pass
 
-%    endfor
+  def end(self):
+    pass
+
+  def run(self):
+    pass
+
+  def __init__(self):
+    BaseAI.__init__(self)

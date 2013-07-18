@@ -25,9 +25,13 @@ def main():
   elif len(sys.argv) == 2: # file, ip address
     tcpIp = sys.argv[1]
 
-  return
-########## RUN MAIN ##########
 
+
+  return
+
+
+
+########## RUN MAIN ##########
 if __name__ == '__main__':
-    main()
+  main()
 
