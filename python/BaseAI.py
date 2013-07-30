@@ -1,12 +1,22 @@
 # -*- python -*-
 
 class BaseAI():
+  #GLOBALS
+% for datum in globals:
+  ${datum.name} = None
+% endfor
+
+  #MODELS
 % for model in models:
 %   if model.type == "Model":
   ${lowercase(model.plural)} = []
+%   endif
 % endfor
 
+  #GLOBALS ACCESSORS
 % for datum in globals:
-  def get${capitalize(datum.name)}(self):
-    pass
+  #${datum.name}
+  #${datum.doc}
+  def get_${datum.name}(self):
+    return self.${datum.name}
 % endfor
