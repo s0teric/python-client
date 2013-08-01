@@ -1,2 +1,2 @@
-login = {"type": "login", "args": {"username": "test", "password": "password"}}
-create_game = {"type": "create_game", "args": {"game": "galapagos"}}
+login = {"type": "login", "args": {"username": "test", "password": "password", "connection_type": ${repr(name)}}}
+create_game = {"type": "join_game", "args": {}}

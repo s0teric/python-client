@@ -69,7 +69,7 @@ def login(conn):
         print(sys.exc_info())
         return False
     else:
-        if data_json.get("args").get("type") == "success":
+        if data_json.get("type") == "success":
             print("Login succeeded!")
             return True
         else:
@@ -78,9 +78,7 @@ def login(conn):
 
 
 def create_game(conn):
-
     create_gameJSON = ClientJSON.create_game.copy()
-    create_gameJSON.get("args").update({"game": BaseAI.game_name})
 
     try:
         print("Attempting to create a game...")
