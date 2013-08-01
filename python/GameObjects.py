@@ -1,8 +1,8 @@
 # -*- python -*-
 
 class GameObject():
-  def __init__(self):
-    pass
+    def __init__(self):
+        pass
 
 % for model in models:
 
@@ -15,33 +15,33 @@ class ${model.name}(GameObject):
 % endif
 
   #INIT
-  def __init__(self\
+    def __init__(self\
 % for datum in model.data:
 , ${datum.name}\
 % endfor
 ):
 % for datum in model.data:
-    self.${datum.name} = ${datum.name}
+        self.${datum.name} = ${datum.name}
 % endfor
 
   #MODEL FUNCTIONS
 %   for func in model.functions + model.properties:
-  #${func.name}
-  #${func.doc}
-  def ${func.name}(self\
+    #${func.name}
+    #${func.doc}
+    def ${func.name}(self\
 % for args in func.arguments:
 , ${args.name}\
 % endfor
 ):
-    pass
+        pass
 %   endfor
 
-  #MODEL DATUM ACCESSORS
+    #MODEL DATUM ACCESSORS
 %   for datum in model.data:
-  #${datum.name}
-  #${datum.doc}
-  def get_${datum.name}(self):
-    return ${datum.name}
+    #${datum.name}
+    #${datum.doc}
+    def get_${datum.name}(self):
+        return ${datum.name}
 %   endfor
 
 

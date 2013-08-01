@@ -1,25 +1,33 @@
 import socket
 import struct
 
-#Recieve a string-JSON message from the server
-def NetworkGetMessage(conn):
-  import socket
 
-  #Recieve 4 bytes for length
-  prefix = conn.recv(4)
-  length = NetworkPrefixLength(prefix)
-  message = conn.recv(length)
+#Recieve string prefixed by uint32 length
+def NetworkRecvString(conn):
 
-  return message
+    #Recieve 4 bytes for length
+    prefix = conn.recv(4)
+    print("Recv Prefix {}".format(prefix))
+    length = struct.unpack('!I', prefix)
+    print("Length {}".format(length))
 
-#Send a string-JSON message to the server by prefixing uint32 network byte order
-def NetworkSendMessage(conn, message):
-  prefixed = repr(struct.pack('!I', len(message))) + message
-  conn.sendall(prefixed)
-  return
+    message = conn.recv(length)
+    print("Recv Message {}".format(message))
+    message = message.decode('utf-8')
 
-#Get the length of the network message from a uint32 network byte order
-def NetworkPrefixLength(message):
-  length = struct.unpack('!I', message)
-  return length
+    return message
+
+
+#Send string prefixed by uint32 length
+def NetworkSendString(conn, message):
+    print("To send {}".format(message))
+    message = message.encode('utf-8')
+    print("Encoded {}".format(message))
+    prefix = struct.pack('!I', len(message))
+    print("Prefix {}".format(prefix))
+    message = prefix + message
+    print("Prefixed {}".format(message))
+
+    conn.sendall(message)
+    return True
 
