@@ -7,6 +7,7 @@ import json
 import ClientJSON
 from AI import *
 import argparse
+import Utility
 
 def main():
   parser = argparse.ArgumentParser(description="Python client for SIG-GAME framework.")
@@ -46,10 +47,10 @@ def login(conn):
   loginJSON.get("args").update({"password": AI.password()})
   try:
     print("Attempting to login...")
-    conn.sendall(json.dumps(loginJSON))
+    Utility.NetworkSendMessage(conn, json.dumps(loginJSON))
 
     print("Retrieving status from server...")
-    data_string = conn.recv(1024)
+    data_string = Utility.NetworkGetMessage(conn)
     print(data_string)
 
     data_json = json.loads(data_string)
@@ -70,10 +71,10 @@ def create_game(conn):
   create_gameJSON.get("args").update({"game": BaseAI.game_name})
   try:
     print("Attempting to create a game...")
-    conn.sendall(json.dumps(create_gameJSON))
+    Utility.NetworkSendMessage(conn, json.dumps(create_gameJSON))
 
     print("Retrieving status from server...")
-    data_string = conn.recv(1024)
+    data_string = Utility.NetworkGetMessage(conn)
     print("RECIEVED: {}".format(data_string))
 
     data_json = json.loads(data_string)
