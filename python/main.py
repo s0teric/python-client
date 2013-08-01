@@ -5,76 +5,86 @@ import time
 import socket
 import json
 import ClientJSON
-
-
-
-# DEFAULTS
-DEFAULT_IP, DEFAULT_PORT = "localhost", 19000
-
+from AI import *
+import argparse
 
 def main():
-  tcpIp, tcpPort = DEFAULT_IP, DEFAULT_PORT
+  parser = argparse.ArgumentParser(description="Python client for SIG-GAME framework.")
+  parser.add_argument("-a", "--address", dest='conn_address', default="localhost", help="The address of the game server.", type=str)
+  parser.add_argument("-p", "--port", dest='conn_port', default="19000", help="The port of the game server.", type=int)
+  parser.add_argument("-n", "--number", dest='game_number', default="0", help="The number of game to connect to on the server.", type=int)
+  args = parser.parse_args()
 
-  if len(sys.argv) > 3 : # Too many args
-    print("More than two args supplied.")
-    print("main.py [ip address] [port]")
-    print("main.py [ip address]")
-    print("main.py")
-    sys.exit(1)
-  elif len(sys.argv) == 3: # file, ip address, port
-    tcpIp = str(sys.argv[1])
-    tcpPort = int(sys.argv[2])
-  elif len(sys.argv) == 2: # file, ip address
-    tcpIp = str(sys.argv[1])
+  connection = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-  connection = None
-
-  ClientJSON.login.get("args").update({"username": "Ruski"})
-  ClientJSON.login.get("args").update({"password": "Malooski"})
-
-  #ATTEMPT TO CONNECT TO SERVER
-  connected = False
-  while not connected:
-    try:
-      print("Attempting to connect...")
-      connection = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-      connection.connect((tcpIp, tcpPort))
-    except:
-      print("Failed to connect.")
-      #connection.close()
-      time.sleep(1)
-    else:
-      print("Connected!")
-      connected = True
-
-  #ATTEMPT TO LOG IN TO SERVER
-  try:
-    print("Attempting to login...")
-    connection.sendall(json.dumps(ClientJSON.login))
-
-    print("Retrieving status from server...")
-    data_string = connection.recv(1024)
-    print(data_string)
-    data_json = json.loads(data_string)
-    print(data_json)
-  except:
-    print("Login failed.")
-    sys.exit(1)
-  else:
-    if data_json.get("status") == "success":
-      print("Login succeeded!")
-    else:
-      print("Login failed.")
-      sys.exit(1)
-
-
-  #ATTEMPT TO CREATE GAME ON THE SERVER
+  if not connect(connection, args.conn_address, args.conn_port): sys.exit(1)
+  if not login(conn=connection): sys.exit(1)
+  if not create_game(conn=connection): sys.exit(1)
 
   print("Closing connection.")
   connection.close()
 
   return
 
+def connect(conn, addr, port):
+  connected = False
+  while not connected:
+    try:
+      print("Attempting to connect...")
+      conn.connect((addr, port))
+    except:
+      print("Failed to connect. {}".format(sys.exc_info()[0]))
+      time.sleep(1)
+    else:
+      print("Connected!")
+      connected = True
+      return True
+
+def login(conn):
+  loginJSON = ClientJSON.login.copy()
+  loginJSON.get("args").update({"username": AI.username()})
+  loginJSON.get("args").update({"password": AI.password()})
+  try:
+    print("Attempting to login...")
+    conn.sendall(json.dumps(loginJSON))
+
+    print("Retrieving status from server...")
+    data_string = conn.recv(1024)
+    print(data_string)
+
+    data_json = json.loads(data_string)
+    print(data_json)
+  except:
+    print("Login failed. {}".format(sys.exc_info()[0]))
+    return False
+  else:
+    if data_json.get("status") == "success":
+      print("Login succeeded!")
+      return True
+    else:
+      print("Login failed. {}".format(sys.exc_info()[0]))
+      return False
+
+def create_game(conn):
+  create_gameJSON = ClientJSON.create_game.copy()
+  create_gameJSON.get("args").update({"game": BaseAI.game_name})
+  try:
+    print("Attempting to create a game...")
+    conn.sendall(json.dumps(create_gameJSON))
+
+    print("Retrieving status from server...")
+    data_string = conn.recv(1024)
+    print("RECIEVED: {}".format(data_string))
+
+    data_json = json.loads(data_string)
+    print(data_json)
+  except:
+    print("Game creation failed.")
+    print(sys.exc_info())
+    return False
+  else:
+    print("Game creation successful!")
+    return True
 
 
 ########## RUN MAIN ##########

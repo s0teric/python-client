@@ -1,6 +1,9 @@
 # -*- python -*-
 
 class BaseAI():
+  #GAMENAME
+  game_name = "${name}"
+
   #GLOBALS
 % for datum in globals:
   ${datum.name} = None
@@ -20,3 +23,4 @@ class BaseAI():
   def get_${datum.name}(self):
     return self.${datum.name}
 % endfor
+

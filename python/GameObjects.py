@@ -38,8 +38,8 @@ class ${model.name}(GameObject):
 
   #MODEL DATUM ACCESSORS
 %   for datum in model.data:
-  #%{datum.name}
-  #%{datum.doc}
+  #${datum.name}
+  #${datum.doc}
   def get_${datum.name}(self):
     return ${datum.name}
 %   endfor
