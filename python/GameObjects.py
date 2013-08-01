@@ -14,7 +14,7 @@ class ${model.name}(${model.parent.name}):
 class ${model.name}(GameObject):
 % endif
 
-  #INIT
+    #INIT
     def __init__(self\
 % for datum in model.data:
 , ${datum.name}\
@@ -24,7 +24,7 @@ class ${model.name}(GameObject):
         self.${datum.name} = ${datum.name}
 % endfor
 
-  #MODEL FUNCTIONS
+    #MODEL FUNCTIONS
 %   for func in model.functions + model.properties:
     #${func.name}
     #${func.doc}

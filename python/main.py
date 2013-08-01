@@ -22,9 +22,14 @@ def main():
 
     connection = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-    if not connect(connection, args.conn_address, args.conn_port): sys.exit(1)
-    if not login(conn=connection): sys.exit(1)
-    if not create_game(conn=connection): sys.exit(1)
+    if not connect(connection, args.conn_address, args.conn_port):
+        sys.exit(1)
+
+    if not login(conn=connection):
+        pass #sys.exit(1)
+
+    if not create_game(conn=connection):
+        sys.exit(1)
 
     print("Closing connection.")
     connection.close()
@@ -38,16 +43,18 @@ def connect(conn, addr, port):
             print("Attempting to connect...")
             conn.connect((addr, port))
         except:
-            print("Failed to connect. {}".format(sys.exc_info()[0]))
+            print("Failed to connect. {}".format(sys.exc_info()))
             time.sleep(1)
         else:
             print("Connected!")
             return True
 
 def login(conn):
+
     loginJSON = ClientJSON.login.copy()
     loginJSON.get("args").update({"username": AI.username()})
     loginJSON.get("args").update({"password": AI.password()})
+
     try:
         print("Attempting to login...")
         Utility.NetworkSendString(conn, json.dumps(loginJSON))
@@ -57,35 +64,36 @@ def login(conn):
         print(data_string)
 
         data_json = json.loads(data_string)
-        print(data_json)
     except:
-        print("Login failed. {}".format(sys.exc_info()[0]))
+        print("Login failed.")
+        print(sys.exc_info())
         return False
     else:
-        if data_json.get("status") == "success":
+        if data_json.get("args").get("type") == "success":
             print("Login succeeded!")
             return True
         else:
-            print("Login failed. {}".format(sys.exc_info()[0]))
+            print("Login failed. {}".format("Failed to parse server message."))
             return False
 
 
 def create_game(conn):
+
     create_gameJSON = ClientJSON.create_game.copy()
     create_gameJSON.get("args").update({"game": BaseAI.game_name})
+
     try:
         print("Attempting to create a game...")
-        Utility.NetworkSendMessage(conn, json.dumps(create_gameJSON))
+        Utility.NetworkSendString(conn, json.dumps(create_gameJSON))
 
         print("Retrieving status from server...")
-        data_string = Utility.NetworkGetMessage(conn)
-        print("RECEIVED: {}".format(data_string))
+        data_string = Utility.NetworkRecvString(conn)
+        print(data_string)
 
         data_json = json.loads(data_string)
-        print(data_json)
     except:
         print("Game creation failed.")
-        print(sys.exc_info()[0])
+        print(sys.exc_info())
         return False
     else:
         print("Game creation successful!")

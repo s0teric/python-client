@@ -1,2 +1,2 @@
-login = {"command": "login", "args": {"username": "test", "password": "password"}}
-create_game = {"command": "create_game", "args": {"game": "galapagos"}}
+login = {"type": "login", "args": {"username": "test", "password": "password"}}
+create_game = {"type": "create_game", "args": {"game": "galapagos"}}

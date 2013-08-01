@@ -7,12 +7,8 @@ def NetworkRecvString(conn):
 
     #Recieve 4 bytes for length
     prefix = conn.recv(4)
-    print("Recv Prefix {}".format(prefix))
-    length = struct.unpack('!I', prefix)
-    print("Length {}".format(length))
-
+    length = struct.unpack('!I', prefix)[0]
     message = conn.recv(length)
-    print("Recv Message {}".format(message))
     message = message.decode('utf-8')
 
     return message
@@ -20,14 +16,11 @@ def NetworkRecvString(conn):
 
 #Send string prefixed by uint32 length
 def NetworkSendString(conn, message):
-    print("To send {}".format(message))
-    message = message.encode('utf-8')
-    print("Encoded {}".format(message))
-    prefix = struct.pack('!I', len(message))
-    print("Prefix {}".format(prefix))
-    message = prefix + message
-    print("Prefixed {}".format(message))
 
+    message = message.encode('utf-8')
+    prefix = struct.pack('!I', len(message))
+    message = prefix + message
     conn.sendall(message)
-    return True
+
+    return
 
