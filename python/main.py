@@ -23,13 +23,16 @@ def main():
     connection = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
     if not connect(connection, args.conn_address, args.conn_port):
-        sys.exit(1)
+        pass #sys.exit(1)
 
     if not login(conn=connection):
         pass #sys.exit(1)
 
     if not create_game(conn=connection):
-        sys.exit(1)
+        pass #sys.exit(1)
+
+    if not main_loop(conn=connection):
+        pass #sys.exit(1)
 
     print("Closing connection.")
     connection.close()
@@ -40,14 +43,15 @@ def main():
 def connect(conn, addr, port):
     while True:
         try:
-            print("Attempting to connect...")
+            print("CLIENT: Attempting to connect...")
             conn.connect((addr, port))
         except:
-            print("Failed to connect. {}".format(sys.exc_info()))
+            print("CLIENT: Failed to connect.")
             time.sleep(1)
         else:
-            print("Connected!")
+            print("CLIENT: Connected!")
             return True
+
 
 def login(conn):
 
@@ -56,59 +60,52 @@ def login(conn):
     loginJSON.get("args").update({"password": AI.password()})
 
     try:
-        print("Attempting to login...")
+        print("CLIENT: Attempting to login...")
         Utility.NetworkSendString(conn, json.dumps(loginJSON))
 
-        print("Retrieving status from server...")
+        print("CLIENT: Retrieving status from server...")
         data_string = Utility.NetworkRecvString(conn)
-        print(data_string)
-
         data_json = json.loads(data_string)
     except:
-        print("Login failed.")
+        print("CLIENT: Login failed.")
         print(sys.exc_info())
         return False
     else:
         if data_json.get("type") == "success":
-            print("Login succeeded!")
+            print("CLIENT: Login succeeded!")
             return True
         else:
-            print("Login failed.")
+            print("CLIENT: Login failed.")
             return False
 
 
 def create_game(conn):
+
     create_gameJSON = ClientJSON.create_game.copy()
 
     try:
-        print("Attempting to create a game...")
+        print("CLIENT: Attempting to create a game...")
         Utility.NetworkSendString(conn, json.dumps(create_gameJSON))
 
-        print("Retrieving status from server...")
+        print("CLIENT: Retrieving status from server...")
         data_string = Utility.NetworkRecvString(conn)
-        print(data_string)
-
         data_json = json.loads(data_string)
     except:
-        print("Game creation failed.")
+        print("CLIENT: Game creation failed.")
         print(sys.exc_info())
         return False
     else:
+        if data_json.get("type") == "success":
+            print("CLIENT: Game creation successful!")
+            return True
+        else:
+            print("CLIENT: Game creation failed.")
+            return False
 
-        print("Game creation successful!")
-        return True
 
-
-#run when it is the client's turn
-def runturn():
+def main_loop(conn):
     while True:
-        message = Utility.NetworkRecvString()
-
-
-
-#run when it is another client's turn
-def waitturn():
-    return
+        message = Utility.NetworkRecvString(conn)
 
 
 def updateGame(message):
