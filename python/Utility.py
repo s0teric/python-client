@@ -11,6 +11,8 @@ def NetworkRecvString(conn):
     message = conn.recv(length)
     message = message.decode('utf-8')
 
+    print("--- RECEIVED ---")
+    print(message)
     return message
 
 
