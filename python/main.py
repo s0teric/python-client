@@ -31,10 +31,16 @@ def main():
     if not create_game(conn=connection):
         pass #sys.exit(1)
 
+    if not init_main(conn=connection):
+        pass #sys.exit(1)
+
     if not main_loop(conn=connection):
         pass #sys.exit(1)
 
-    print("Closing connection.")
+    if not end_main(conn=connection):
+        pass #sys.exit(1)
+
+    print("CLIENT: Closing connection.")
     connection.close()
 
     return
@@ -71,7 +77,7 @@ def login(conn):
         print(sys.exc_info())
         return False
     else:
-        if data_json.get("type") == "success":
+        if data_json.get("type", "failure") == "success":
             print("CLIENT: Login succeeded!")
             return True
         else:
@@ -95,18 +101,27 @@ def create_game(conn):
         print(sys.exc_info())
         return False
     else:
-        if data_json.get("type") == "success":
+        if data_json.get("type", "failure") == "success":
             print("CLIENT: Game creation successful!")
             return True
         else:
             print("CLIENT: Game creation failed.")
             return False
 
+def init_main(conn):
+    print("CLIENT: Before main loop.")
+    return
 
 def main_loop(conn):
+    print("CLIENT: Main loop.")
     while True:
         message = Utility.NetworkRecvString(conn)
 
+    return
+
+def end_main(conn):
+    print("CLIENT: End main loop.")
+    return
 
 def updateGame(message):
     additions = []

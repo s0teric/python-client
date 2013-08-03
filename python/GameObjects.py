@@ -1,5 +1,9 @@
 # -*- python -*-
 
+import Utility
+from AI import *
+import ClientJSON
+
 class GameObject():
     def __init__(self):
         pass
@@ -33,7 +37,14 @@ class ${model.name}(GameObject):
 , ${args.name}\
 % endfor
 ):
-        pass
+        function_call = ClientJSON.function_call.copy()
+        function_call.update({"command": ${repr(func.name)}})
+
+% for args in func.arguments:
+        function_call.get("args").update({${repr(args.name)}: repr(${args.name})})
+% endfor
+        Utility.NetworkSendString(BaseAI.connection, function_call)
+        return False
 %   endfor
 
     #MODEL DATUM ACCESSORS

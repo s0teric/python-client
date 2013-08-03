@@ -1,6 +1,10 @@
 # -*- python -*-
+import socket
 
 class BaseAI():
+    #CONNECTION
+    connection = None
+
     #GAMENAME
     game_name = "${name}"
 
