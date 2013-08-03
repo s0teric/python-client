@@ -73,7 +73,7 @@ def login(conn):
             print("Login succeeded!")
             return True
         else:
-            print("Login failed. {}".format("Failed to parse server message."))
+            print("Login failed.")
             return False
 
 
@@ -94,9 +94,34 @@ def create_game(conn):
         print(sys.exc_info())
         return False
     else:
+
         print("Game creation successful!")
         return True
 
+
+#run when it is the client's turn
+def runturn():
+    while True:
+        message = Utility.NetworkRecvString()
+
+
+
+#run when it is another client's turn
+def waitturn():
+    return
+
+
+def updateGame(message):
+    additions = []
+    global_changes = {}
+    changes = []
+    removals = []
+
+
+
+
+
+    pass
 
 ########## RUN MAIN ##########
 if __name__ == '__main__':
