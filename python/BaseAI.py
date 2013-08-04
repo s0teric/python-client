@@ -2,10 +2,12 @@
 import socket
 
 class BaseAI():
-    #CONNECTION
-    connection = None
 
-    #GAMENAME
+    def __init__(self):
+        pass
+
+    connection = None
+    player_id = 0
     game_name = "${name}"
 
     #GLOBALS
