@@ -17,13 +17,13 @@ def main():
                         help="The address of the game server.", type=str)
     parser.add_argument("-p", "--port", dest='conn_port', default="19000",
                         help="The port of the game server.", type=int)
-    parser.add_argument("-n", "--number", dest='game_number', default="0",
-                        help="The number of game to connect to on the server.", type=int)
+    parser.add_argument("-n", "--name", dest='game_name', default=None,
+                        help="The name of game to connect to on the server.")
     args = parser.parse_args()
 
     connection = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-    game = Game(conn=connection, addr=args.conn_address, port=args.conn_port, num=args.game_number)
+    game = Game(conn=connection, addr=args.conn_address, port=args.conn_port, name=args.game_name)
     game.run()
 
     print("CLIENT: Closing connection.")

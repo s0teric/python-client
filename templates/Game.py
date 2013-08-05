@@ -3,14 +3,15 @@ import ClientJSON
 from AI import *
 import json
 import sys
+from GameObjects import *
 
 class Game:
 
-    def __init__(self, conn, addr, port, num):
+    def __init__(self, conn, addr, port, name):
         self.serv_conn = conn
         self.serv_addr = addr
         self.serv_port = port
-        self.game_num = num
+        self.game_name = name
         self.ai = AI()
         self.ai.connection = self.serv_conn
 
@@ -57,13 +58,17 @@ class Game:
     def create_game(self):
 
         create_gameJSON = ClientJSON.create_game.copy()
+        if self.game_name is not None:
+            create_gameJSON.get("args").update({"game_name": self.game_name})
 
+        #ATTEMPT TO CREATE GAME
         try:
             print("CLIENT: Attempting to create a game...")
             Utility.NetworkSendString(self.serv_conn, json.dumps(create_gameJSON))
 
             print("CLIENT: Retrieving status from server...")
             data_string = Utility.NetworkRecvString(self.serv_conn)
+
             data_json = json.loads(data_string)
         except:
             print("CLIENT: Game creation failed.")
@@ -71,11 +76,28 @@ class Game:
             return False
         else:
             if data_json.get("type", "failure") == "success":
-                AI.player_id = int(data_json.get("args").get("name"))
-                print("CLIENT: Game creation successful!")
+                self.game_name = data_json.get("args").get("name")
+                print("CLIENT: Game created: {}".format(self.game_name))
                 return True
             else:
                 print("CLIENT: Game creation failed.")
+                return False
+
+    #Receive Player ID from server
+    def recv_player_id(self):
+        try:
+            print("CLIENT: Receive client's player id.")
+            data_string = Utility.NetworkRecvString(self.serv_conn)
+            data_json = json.loads(data_string)
+        except:
+            print("CLIENT: Failed to receive player id.")
+            return False
+        else:
+            if data_json.get("type") == "player_id":
+                self.ai.player_id = data_json.get("args").get("id")
+                return True
+            else:
+                print("CLIENT: Failed to receive player id.")
                 return False
 
     #Run when it is the Client's turn.
@@ -97,6 +119,16 @@ class Game:
     #Runs before main_loop has began.
     def init_main(self):
         print("CLIENT: Init main.")
+
+        #Receive initial game state.
+        try:
+            print("CLIENT: Receiving initial game state.")
+            message = Utility.NetworkRecvString(self.serv_conn)
+        except:
+            print("CLIENT: Unable to receive initial game state.")
+        else:
+            self.update_game(message)
+
         self.ai.init()
         return True
 
@@ -109,33 +141,50 @@ class Game:
     #Main connection loop until end of game.
     def main_loop(self):
         print("CLIENT: Main loop.")
-        while True:
-            if self.ai.player_id == 1:
-                self.active_turn()
+        pass
 
-            message = Utility.NetworkRecvString(self.serv_conn)
+    #Update game from message
+    def update_game(self, message):
+        try:
+            message = json.loads(message)
+        except:
+            return False
+
+        if message.get("type") != "changes":
+            return False
+
+        for change in message.get("args").get("changes"):
+            if change.get("action") == "add":
+                self.change_add(change)
+
+            elif change.get("action") == "remove":
+                self.change_remove(change)
+
+            elif change.get("action") == "update":
+                self.change_update(change)
+
+            elif change.get("action") == "global_update":
+                self.change_global_update(change)
 
         return True
 
-    def echoForever(self):
-        while True:
-            message = Utility.NetworkRecvString(self.serv_conn)
-        return True
+    def change_add(self, change):
+        pass
+
+    def change_remove(self, change):
+        pass
+
+    def change_update(self, change):
+        pass
+
+    def change_global_update(self, change):
+        pass
 
     def run(self):
-        if not self.connect():
-            return False
-
-        if not self.login():
-            return False
-
-        if not self.create_game():
-            return False
-
-        self.echoForever()
-
-        #if not self.init_main(): return False
-
-        #if not self.main_loop(): return False
-
-        #if not self.end_main(): return False
+        if not self.connect(): return False
+        if not self.login(): return False
+        if not self.create_game(): return False
+        if not self.recv_player_id(): return False
+        if not self.init_main(): return False
+        if not self.main_loop(): return False
+        if not self.end_main(): return False

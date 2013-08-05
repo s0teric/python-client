@@ -18,7 +18,8 @@ def NetworkRecvString(conn):
 
 #Send string prefixed by uint32 length
 def NetworkSendString(conn, message):
-
+    print("--- SEND ---")
+    print(message)
     message = message.encode('utf-8')
     prefix = struct.pack('!I', len(message))
     message = prefix + message
