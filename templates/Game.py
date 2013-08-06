@@ -3,7 +3,8 @@ import ClientJSON
 from AI import *
 import json
 import sys
-from GameObjects import *
+import GameObjects
+import operator
 
 class Game:
 
@@ -166,18 +167,66 @@ class Game:
             elif change.get("action") == "global_update":
                 self.change_global_update(change)
 
+% for model in models:
+% if model.type == "Model":
+        print( self.ai.${lowercase(model.plural)} )
+% endif
+% endfor
         return True
 
+    #Parse the add action
     def change_add(self, change):
-        pass
+        values = change.get("values")
+% for model in models:
+% if model.type == "Model":
+        if change.get("type") == "${model.name}":
+            temp = GameObjects.${model.name}(\
+% for datum in model.data:
+${datum.name}=values.get("${datum.name}"),\
+% endfor
+)
+            self.ai.${lowercase(model.plural)}.append(temp)
+% endif
+% endfor
+        return True
 
+    #Parse the remove action.
     def change_remove(self, change):
-        pass
+        remove_id = change.get("id")
+% for model in models:
+% if model.type == "Model":
+        try:
+            index = self.ai.${lowercase(model.plural)}.find(remove_id, key=operator.attrgetter('id'))
+        except:
+            pass
+        else:
+            self.ai.${lowercase(model.plural)}.remove(index)
+            return True
+% endif
+% endfor
+        return False
 
+    #Parse the update action.
     def change_update(self, change):
-        pass
+        change_id = change.get("id")
+        values = change.get("values")
+% for model in models:
+% if model.type == "Model":
+        try:
+            index = self.ai.${lowercase(model.plural)}.find(change_id, key=operator.attrgetter('id'))
+        except:
+            pass
+        else:
+            self.ai.${lowercase(model.plural)}[index].__dict__.update(values)
+            return True
+% endif
+% endfor
+        return False
 
+    #Parse the global_update action
     def change_global_update(self, change):
+        values = change.get("values")
+        self.ai.__dict__.update(values)
         pass
 
     def run(self):

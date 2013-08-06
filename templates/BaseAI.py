@@ -16,6 +16,7 @@ class BaseAI():
 % endfor
 
     #MODELS
+
 % for model in models:
 %   if model.type == "Model":
     ${lowercase(model.plural)} = []
