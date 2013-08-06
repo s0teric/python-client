@@ -95,7 +95,7 @@ class Game:
             return False
         else:
             if data_json.get("type") == "player_id":
-                self.ai.player_id = data_json.get("args").get("id")
+                self.ai.my_player_id = data_json.get("args").get("id")
                 return True
             else:
                 print("CLIENT: Failed to receive player id.")
@@ -115,7 +115,7 @@ class Game:
         while same_turn:
             message = Utility.NetworkRecvString(self.serv_conn)
 
-        return
+        return True
 
     #Runs before main_loop has began.
     def init_main(self):
@@ -142,7 +142,26 @@ class Game:
     #Main connection loop until end of game.
     def main_loop(self):
         print("CLIENT: Main loop.")
-        pass
+
+        #Wait to receive start_turn
+        try:
+            message = Utility.NetworkRecvString(self.serv_conn)
+            message = json.loads(message)
+        except:
+            print("CLIENT: Did not receive start_turn message.")
+            return False
+        else:
+            if message.get("type") != "start_turn":
+                print("CLIENT: Message received was not start_turn")
+                return False
+
+        #Main loop
+        while True:
+            if self.ai.my_player_id == self.ai.player_id:
+                self.active_turn()
+            else:
+                self.inactive_turn()
+        return True
 
     #Update game from message
     def update_game(self, message):
@@ -169,7 +188,7 @@ class Game:
 
 % for model in models:
 % if model.type == "Model":
-        print( self.ai.${lowercase(model.plural)} )
+        print(self.ai.${lowercase(model.plural)})
 % endif
 % endfor
         return True
@@ -180,7 +199,7 @@ class Game:
 % for model in models:
 % if model.type == "Model":
         if change.get("type") == "${model.name}":
-            temp = GameObjects.${model.name}(\
+            temp = GameObjects.${model.name}(connection=self.serv_conn, \
 % for datum in model.data:
 ${datum.name}=values.get("${datum.name}"),\
 % endfor

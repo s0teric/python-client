@@ -2,6 +2,7 @@
 
 import Utility
 from AI import *
+import json
 import ClientJSON
 
 class GameObject():
@@ -19,11 +20,12 @@ class ${model.name}(GameObject):
 % endif
 
     #INIT
-    def __init__(self\
+    def __init__(self, connection\
 % for datum in model.data:
 , ${datum.name}\
 % endfor
 ):
+        self.connection = connection
 % for datum in model.data:
         self.${datum.name} = ${datum.name}
 % endfor
@@ -38,13 +40,23 @@ class ${model.name}(GameObject):
 % endfor
 ):
         function_call = ClientJSON.function_call.copy()
-        function_call.update({"command": ${repr(func.name)}})
+        function_call.update({"type": ${repr(func.name)}})
+        function_call.get("args").update({"actor": self.id})
 
 % for args in func.arguments:
         function_call.get("args").update({${repr(args.name)}: repr(${args.name})})
 % endfor
-        Utility.NetworkSendString(BaseAI.connection, function_call)
-        return False
+        try:
+            Utility.NetworkSendString(self.connection, json.dumps(function_call))
+        except:
+            print("CLIENT: Failed to send command ${func.name}.")
+
+        try:
+            message = Utility.NetworkRecvString(self.connection)
+        except:
+            print("CLIENT: Failed to receive status after command ${func.name}.")
+
+        return True
 %   endfor
 
     #MODEL DATUM ACCESSORS

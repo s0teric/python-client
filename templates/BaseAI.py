@@ -7,7 +7,7 @@ class BaseAI():
         pass
 
     connection = None
-    player_id = 0
+    my_player_id = 0
     game_name = "${name}"
 
     #GLOBALS
