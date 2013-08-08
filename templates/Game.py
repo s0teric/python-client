@@ -105,17 +105,13 @@ class Game:
         print("CLIENT: Main loop.")
 
         while True:
-            message = self.receive()
-            if message['type'] == "start_turn":
-                print('Trying to start turn')
-                print(self.ai.player_id)
-                print(self.ai.my_player_id)
-
-                if self.ai.my_player_id == self.ai.player_id:
-                    self.ai.run()
-                    Utility.NetworkSendString(self.serv_conn, json.dumps(ClientJSON.end_turn))
-            elif message['type'] == 'game_over':
+            message = self.wait_for('start_turn', 'game_over')
+            if message['type'] == 'game_over':
                 return True
+
+            if self.ai.my_player_id == self.ai.player_id:
+                self.ai.run()
+                Utility.NetworkSendString(self.serv_conn, json.dumps(ClientJSON.end_turn))
 
     #Echo forever
     def echo_forever(self):
