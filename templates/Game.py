@@ -37,6 +37,8 @@ class Game:
 
         if message['type'] == 'changes':
             self.update_game(message)
+        elif message['type'] == 'player_id':
+            self.ai.my_player_id = message['args']['id']
         return message
 
     def wait_for(self, *types):
@@ -47,7 +49,6 @@ class Game:
 
     #Attempt to login to the server
     def login(self):
-
         login_json = ClientJSON.login.copy()
         login_json['args']['username'] = self.ai.username
         login_json['args']['password'] = self.ai.password
@@ -64,50 +65,26 @@ class Game:
 
     #Attempt to create a game on the server
     def create_game(self):
-
-        create_gameJSON = ClientJSON.create_game.copy()
+        create_game_json = ClientJSON.create_game.copy()
         if self.game_name is not None:
-            create_gameJSON.get("args").update({"game_name": self.game_name})
+            create_game_json['args']['game_name'] =  self.game_name
 
-        #ATTEMPT TO CREATE GAME
-        try:
-            print("CLIENT: Attempting to create a game...")
-            Utility.NetworkSendString(self.serv_conn, json.dumps(create_gameJSON))
+        Utility.NetworkSendString(self.serv_conn, json.dumps(create_game_json))
 
-            print("CLIENT: Retrieving status from server...")
-            data_string = Utility.NetworkRecvString(self.serv_conn)
-
-            data_json = json.loads(data_string)
-        except:
-            print("CLIENT: Game creation failed.")
-            print(sys.exc_info())
-            return False
+        message = self.wait_for('success', 'failure')
+        if message['type'] == "success":
+            self.game_name = message['args']['name']
+            print("CLIENT: Game created: {}".format(self.game_name))
+            return True
         else:
-            if data_json.get("type", "failure") == "success":
-                self.game_name = data_json.get("args").get("name")
-                print("CLIENT: Game created: {}".format(self.game_name))
-                return True
-            else:
-                print("CLIENT: Game creation failed.")
-                return False
+            print("CLIENT: Game creation failed.")
+            return False
 
     #Receive Player ID from server
     def recv_player_id(self):
-        try:
-            print("CLIENT: Receive client's player id.")
-            data_string = Utility.NetworkRecvString(self.serv_conn)
-            data_json = json.loads(data_string)
-        except:
-            print("CLIENT: Failed to receive player id.")
-            return False
-        else:
-            if data_json.get("type") == "player_id":
-                self.ai.my_player_id = data_json.get("args").get("id")
-                return True
-            else:
-                print("CLIENT: Failed to receive player id.")
-                return False
-
+        print("CLIENT: waiting for player id")
+        self.wait_for('player_id')
+        return True
 
     #Runs before main_loop has began.
     def init_main(self):
