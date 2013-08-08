@@ -113,6 +113,17 @@ class Game:
                 self.ai.run()
                 Utility.NetworkSendString(self.serv_conn, json.dumps(ClientJSON.end_turn))
 
+     
+    def get_log(self):
+        log_json = ClientJSON.get_log.copy()
+        Utility.NetworkSendString(self.serv_conn, json.dumps(log_json))
+
+        message = self.wait_for('success', 'failure')
+        if message['type'] == "success":
+            file = open(self.game_name + '.glog', 'wb')
+            file.write(message['args']['log'].encode('utf-8'))
+            file.close()
+
     #Echo forever
     def echo_forever(self):
         while True:
@@ -208,3 +219,5 @@ class Game:
         if not self.init_main(): return False
         if not self.main_loop(): return False
         if not self.end_main(): return False
+        if not self.get_log(): return False
+        
