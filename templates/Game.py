@@ -31,6 +31,14 @@ class Game:
                 print("CLIENT: Connected!")
                 return True
 
+    def receive(self):
+        data = Utility.NetworkRecvString(self.serv_conn)
+        message = json.loads(data)
+
+        if message['type'] == 'changes':
+            self.update_game(message)
+        return message
+
     #Attempt to login to the server
     def login(self):
 
@@ -103,80 +111,15 @@ class Game:
                 print("CLIENT: Failed to receive player id.")
                 return False
 
-    #Run when it is the Client's turn.
-    def active_turn(self):
-        print("CLIENT: Active turn.")
-        self.ai.run()
-
-        #Send end_turn
-        Utility.NetworkSendString(self.serv_conn, json.dumps(ClientJSON.end_turn))
-
-        #Receive end_turn
-        message = Utility.NetworkRecvString(self.serv_conn)
-
-        #Receive updates until start of turn
-        in_limbo = True
-        while in_limbo:
-            message = Utility.NetworkRecvString(self.serv_conn)
-            message = json.loads(message)
-
-            if message.get("type") == "changes":
-                self.update_game(message)
-            elif message.get("type") == "start_turn":
-                in_limbo = False
-
-        #Receive success or failure
-        message = Utility.NetworkRecvString(self.serv_conn)
-        message = json.loads(message)
-
-        if message.get("type") == "success":
-            return True
-        elif message.get("type") == "failure":
-            return False
-        else:
-            return False
-
-    #Run when it is not the Client's turn.
-    def inactive_turn(self):
-        print("CLIENT: Inactive turn.")
-
-        #Run until end_turn
-        same_turn = True
-        while same_turn:
-            message = Utility.NetworkRecvString(self.serv_conn)
-            message = json.loads(message)
-
-            #Receive end_turn
-            if message.get("type") == "changes":
-                self.update_game(message)
-            elif message.get("type") == "end_turn":
-                same_turn = False
-
-        #Receive updates until start of turn
-        in_limbo = True
-        while in_limbo:
-            message = Utility.NetworkRecvString(self.serv_conn)
-            message = json.loads(message)
-
-            if message.get("type") == "changes":
-                self.update_game(message)
-            elif message.get("type") == "start_turn":
-                in_limbo = False
-
-        return True
 
     #Runs before main_loop has began.
     def init_main(self):
         print("CLIENT: Init main.")
-
-        #Receive initial game state.
-        try:
-            print("CLIENT: Receiving initial game state.")
-            message = Utility.NetworkRecvString(self.serv_conn)
-        except:
-            print("CLIENT: Unable to receive initial game state.")
-        else:
-            self.update_game(message)
+        
+        while True:
+            message = self.receive()
+            if message['type'] == 'start_game':
+                break
 
         self.ai.init()
         return True
@@ -192,14 +135,17 @@ class Game:
         print("CLIENT: Main loop.")
 
         while True:
-            message = Utility.NetworkRecvString(self.serv_conn)
-            message = json.loads(message)
-            if message.get("type") == "start_turn":
+            message = self.receive()
+            if message['type'] == "start_turn":
+                print('Trying to start turn')
+                print(self.ai.player_id)
+                print(self.ai.my_player_id)
+
                 if self.ai.my_player_id == self.ai.player_id:
-                    self.active_turn()
-                else:
-                    self.inactive_turn()
-        return True
+                    self.ai.run()
+                    Utility.NetworkSendString(self.serv_conn, json.dumps(ClientJSON.end_turn))
+            elif message['type'] == 'game_over':
+                return True
 
     #Echo forever
     def echo_forever(self):
@@ -209,11 +155,6 @@ class Game:
 
     #Update game from message
     def update_game(self, message):
-        try:
-            message = json.loads(message)
-        except:
-            return False
-
         if message.get("type") != "changes":
             return False
 
