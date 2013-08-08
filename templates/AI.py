@@ -1,16 +1,11 @@
 # -*- python -*-
 from BaseAI import BaseAI
-from GameObjects import *
 
 
 class AI(BaseAI):
-    @staticmethod
-    def username():
-        return "Shell AI"
+    username = "Shell AI"
 
-    @staticmethod
-    def password():
-        return "password"
+    password = "password"
 
     def init(self):
         pass

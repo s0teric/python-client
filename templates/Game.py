@@ -39,31 +39,28 @@ class Game:
             self.update_game(message)
         return message
 
+    def wait_for(self, *types):
+        while True:
+            message = self.receive()
+            if message['type'] in types:
+                return message
+
     #Attempt to login to the server
     def login(self):
 
-        loginJSON = ClientJSON.login.copy()
-        loginJSON.get("args").update({"username": self.ai.username()})
-        loginJSON.get("args").update({"password": self.ai.password()})
+        login_json = ClientJSON.login.copy()
+        login_json['args']['username'] = self.ai.username
+        login_json['args']['password'] = self.ai.password
 
-        try:
-            print("CLIENT: Attempting to login...")
-            Utility.NetworkSendString(self.serv_conn, json.dumps(loginJSON))
+        Utility.NetworkSendString(self.serv_conn, json.dumps(login_json))
 
-            print("CLIENT: Retrieving status from server...")
-            data_string = Utility.NetworkRecvString(self.serv_conn)
-            data_json = json.loads(data_string)
-        except:
-            print("CLIENT: Login failed.")
-            print(sys.exc_info())
-            return False
+        message = self.wait_for('success', 'failure')
+        if message['type'] == 'success':
+            print("CLIENT: Login succeeded!")
+            return True
         else:
-            if data_json.get("type", "failure") == "success":
-                print("CLIENT: Login succeeded!")
-                return True
-            else:
-                print("CLIENT: Login failed.")
-                return False
+            print("CLIENT: Login failed.")
+            return False
 
     #Attempt to create a game on the server
     def create_game(self):
