@@ -47,12 +47,12 @@ class ${model.name}(GameObject):
         function_call.get("args").update({${repr(args.name)}: repr(${args.name})})
 % endfor
 
-        utility.NetworkSendString(self.connection, json.dumps(function_call))
+        utility.send_string(self.connection, json.dumps(function_call))
 
         received_status = False
         status = None
         while not received_status:
-            message = utility.NetworkRecvString(self.connection)
+            message = utility.receive_string(self.connection)
             message = json.loads(message)
 
             if message.get("type") == "success":

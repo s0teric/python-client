@@ -3,7 +3,7 @@ import struct
 
 
 #Recieve string prefixed by uint32 length
-def NetworkRecvString(conn):
+def receive_string(conn):
 
     #Recieve 4 bytes for length
     prefix = conn.recv(4)
@@ -17,7 +17,7 @@ def NetworkRecvString(conn):
 
 
 #Send string prefixed by uint32 length
-def NetworkSendString(conn, message):
+def send_string(conn, message):
     print("--- SEND ---")
     print(message)
     message = message.encode('utf-8')

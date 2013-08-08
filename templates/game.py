@@ -32,7 +32,7 @@ class Game:
                 return True
 
     def receive(self):
-        data = utility.NetworkRecvString(self.serv_conn)
+        data = utility.receive_string(self.serv_conn)
         message = json.loads(data)
 
         if message['type'] == 'changes':
@@ -53,7 +53,7 @@ class Game:
         login_json['args']['username'] = self.ai.username
         login_json['args']['password'] = self.ai.password
 
-        utility.NetworkSendString(self.serv_conn, json.dumps(login_json))
+        utility.send_string(self.serv_conn, json.dumps(login_json))
 
         message = self.wait_for('success', 'failure')
         if message['type'] == 'success':
@@ -69,7 +69,7 @@ class Game:
         if self.game_name is not None:
             create_game_json['args']['game_name'] =  self.game_name
 
-        utility.NetworkSendString(self.serv_conn, json.dumps(create_game_json))
+        utility.send_string(self.serv_conn, json.dumps(create_game_json))
 
         message = self.wait_for('success', 'failure')
         if message['type'] == "success":
@@ -111,12 +111,12 @@ class Game:
 
             if self.ai.my_player_id == self.ai.player_id:
                 self.ai.run()
-                utility.NetworkSendString(self.serv_conn, json.dumps(client_json.end_turn))
+                utility.send_string(self.serv_conn, json.dumps(client_json.end_turn))
 
      
     def get_log(self):
         log_json = client_json.get_log.copy()
-        utility.NetworkSendString(self.serv_conn, json.dumps(log_json))
+        utility.send_string(self.serv_conn, json.dumps(log_json))
 
         message = self.wait_for('success', 'failure')
         if message['type'] == "success":
@@ -127,7 +127,7 @@ class Game:
     #Echo forever
     def echo_forever(self):
         while True:
-            message = utility.NetworkRecvString(self.serv_conn)
+            message = utility.receive_string(self.serv_conn)
         return True
 
     #Update game from message
