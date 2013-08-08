@@ -1,5 +1,5 @@
 # -*- python -*-
-from BaseAI import BaseAI
+from base_ai import BaseAI
 
 
 class AI(BaseAI):

@@ -1,10 +1,8 @@
 # -*- python -*-
 
-import Utility
-from AI import *
+import utility
 import json
-import Game
-import ClientJSON
+import client_json
 
 class GameObject():
     def __init__(self):
@@ -41,7 +39,7 @@ class ${model.name}(GameObject):
 , ${args.name}\
 % endfor
 ):
-        function_call = ClientJSON.function_call.copy()
+        function_call = client_json.function_call.copy()
         function_call.update({"type": ${repr(func.name)}})
         function_call.get("args").update({"actor": self.id})
 
@@ -49,12 +47,12 @@ class ${model.name}(GameObject):
         function_call.get("args").update({${repr(args.name)}: repr(${args.name})})
 % endfor
 
-        Utility.NetworkSendString(self.connection, json.dumps(function_call))
+        utility.NetworkSendString(self.connection, json.dumps(function_call))
 
         received_status = False
         status = None
         while not received_status:
-            message = Utility.NetworkRecvString(self.connection)
+            message = utility.NetworkRecvString(self.connection)
             message = json.loads(message)
 
             if message.get("type") == "success":

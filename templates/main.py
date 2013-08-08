@@ -1,14 +1,8 @@
 #!/usr/bin/env python
 
-import sys
-import time
 import socket
-import json
-import ClientJSON
-from AI import *
 import argparse
-import Utility
-from Game import *
+from game import Game
 
 
 def main():
