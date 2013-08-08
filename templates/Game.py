@@ -89,11 +89,7 @@ class Game:
     #Runs before main_loop has began.
     def init_main(self):
         print("CLIENT: Init main.")
-        
-        while True:
-            message = self.receive()
-            if message['type'] == 'start_game':
-                break
+        self.wait_for('start_game')
 
         self.ai.init()
         return True
