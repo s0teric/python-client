@@ -1,10 +1,12 @@
 import time
 import ClientJSON
-from AI import *
+import AI
 import json
 import sys
 import GameObjects
 import operator
+import Utility
+
 
 class Game:
 
@@ -13,7 +15,7 @@ class Game:
         self.serv_addr = addr
         self.serv_port = port
         self.game_name = name
-        self.ai = AI()
+        self.ai = AI.AI()
         self.ai.connection = self.serv_conn
 
     #Attempt to connect to the server
@@ -105,15 +107,61 @@ class Game:
     def active_turn(self):
         print("CLIENT: Active turn.")
         self.ai.run()
-        Utility.NetworkSendString(self.serv_conn, json.dumps(ClientJSON.next_turn))
-        pass
+
+        #Send end_turn
+        Utility.NetworkSendString(self.serv_conn, json.dumps(ClientJSON.end_turn))
+
+        #Receive end_turn
+        message = Utility.NetworkRecvString(self.serv_conn)
+
+        #Receive updates until start of turn
+        in_limbo = True
+        while in_limbo:
+            message = Utility.NetworkRecvString(self.serv_conn)
+            message = json.loads(message)
+
+            if message.get("type") == "changes":
+                self.update_game(message)
+            elif message.get("type") == "start_turn":
+                in_limbo = False
+
+        #Receive success or failure
+        message = Utility.NetworkRecvString(self.serv_conn)
+        message = json.loads(message)
+
+        if message.get("type") == "success":
+            return True
+        elif message.get("type") == "failure":
+            return False
+        else:
+            return False
 
     #Run when it is not the Client's turn.
     def inactive_turn(self):
         print("CLIENT: Inactive turn.")
+
+        #Run until end_turn
         same_turn = True
         while same_turn:
             message = Utility.NetworkRecvString(self.serv_conn)
+            message = json.loads(message)
+
+            #Receive end_turn
+            if message.get("type") == "changes":
+                self.update_game(message)
+            elif message.get("type") == "end_turn":
+                same_turn = False
+
+        #Receive updates until start of turn
+        in_limbo = True
+        while in_limbo:
+            message = Utility.NetworkRecvString(self.serv_conn)
+            message = json.loads(message)
+
+            if message.get("type") == "changes":
+                self.update_game(message)
+            elif message.get("type") == "start_turn":
+                in_limbo = False
 
         return True
 
@@ -143,24 +191,20 @@ class Game:
     def main_loop(self):
         print("CLIENT: Main loop.")
 
-        #Wait to receive start_turn
-        try:
+        while True:
             message = Utility.NetworkRecvString(self.serv_conn)
             message = json.loads(message)
-        except:
-            print("CLIENT: Did not receive start_turn message.")
-            return False
-        else:
-            if message.get("type") != "start_turn":
-                print("CLIENT: Message received was not start_turn")
-                return False
+            if message.get("type") == "start_turn":
+                if self.ai.my_player_id == self.ai.player_id:
+                    self.active_turn()
+                else:
+                    self.inactive_turn()
+        return True
 
-        #Main loop
+    #Echo forever
+    def echo_forever(self):
         while True:
-            if self.ai.my_player_id == self.ai.player_id:
-                self.active_turn()
-            else:
-                self.inactive_turn()
+            message = Utility.NetworkRecvString(self.serv_conn)
         return True
 
     #Update game from message
@@ -199,9 +243,9 @@ class Game:
 % for model in models:
 % if model.type == "Model":
         if change.get("type") == "${model.name}":
-            temp = GameObjects.${model.name}(connection=self.serv_conn, \
+            temp = GameObjects.${model.name}(connection=self.serv_conn, parent_game=self\
 % for datum in model.data:
-${datum.name}=values.get("${datum.name}"),\
+, ${datum.name}=values.get("${datum.name}")\
 % endfor
 )
             self.ai.${lowercase(model.plural)}.append(temp)
@@ -246,13 +290,14 @@ ${datum.name}=values.get("${datum.name}"),\
     def change_global_update(self, change):
         values = change.get("values")
         self.ai.__dict__.update(values)
-        pass
+        return True
 
     def run(self):
         if not self.connect(): return False
         if not self.login(): return False
         if not self.create_game(): return False
         if not self.recv_player_id(): return False
+
         if not self.init_main(): return False
         if not self.main_loop(): return False
         if not self.end_main(): return False
