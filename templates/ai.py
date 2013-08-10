@@ -14,8 +14,6 @@ class AI(BaseAI):
         pass
 
     def run(self):
-        for player in self.players:
-            player.talk("PLAYER TALK MESSAGE")
         pass
 
     def __init__(self):

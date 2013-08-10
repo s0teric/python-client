@@ -1,6 +1,8 @@
 import socket
 import struct
 
+verbose = False
+very_verbose = False
 
 #Recieve string prefixed by uint32 length
 def receive_string(conn):
@@ -11,19 +13,31 @@ def receive_string(conn):
     message = conn.recv(length)
     message = message.decode('utf-8')
 
-    print("--- RECEIVED ---")
-    print(message)
+    vv_print("Received: {}".format(message))
+
     return message
 
 
 #Send string prefixed by uint32 length
 def send_string(conn, message):
-    print("--- SEND ---")
-    print(message)
+
+    vv_print("Sending: {}".format(message))
+
     message = message.encode('utf-8')
     prefix = struct.pack('!I', len(message))
     message = prefix + message
     conn.sendall(message)
 
     return
+
+#Verbose print
+def v_print(message):
+    if verbose or very_verbose:
+        print(message)
+    return True
+
+def vv_print(message):
+    if very_verbose:
+        print(message)
+    return True
 
