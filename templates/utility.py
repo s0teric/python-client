@@ -9,13 +9,18 @@ def receive_string(conn):
 
     #Recieve 4 bytes for length
     prefix = conn.recv(4)
-    length = struct.unpack('!I', prefix)[0]
-    message = conn.recv(length)
-    message = message.decode('utf-8')
+    expected_length = struct.unpack('!I', prefix)[0]
 
-    vv_print("Received: {}".format(message))
+    full_message = str()
+    while len(full_message) < expected_length:
+        message = conn.recv(expected_length - len(full_message))
+        full_message += message
 
-    return message
+    full_message = full_message.decode('utf-8')
+
+    vv_print("Received: {}".format(full_message))
+
+    return full_message
 
 
 #Send string prefixed by uint32 length
