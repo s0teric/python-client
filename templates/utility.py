@@ -11,7 +11,7 @@ def receive_string(conn):
     prefix = conn.recv(4)
     expected_length = struct.unpack('!I', prefix)[0]
 
-    full_message = str()
+    full_message = bytes()
     while len(full_message) < expected_length:
         message = conn.recv(expected_length - len(full_message))
         full_message += message
