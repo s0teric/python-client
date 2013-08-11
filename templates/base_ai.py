@@ -1,33 +1,45 @@
 # -*- python -*-
 import socket
 
+## @class BaseAI
+#  @brief Class to store competitor-accessible data and functions
+
+
 class BaseAI():
 
     def __init__(self):
         pass
 
     connection = None
-    my_player_id = 0
     game_name = "${name}"
 
-    #GLOBALS
-% for datum in globals:
-    ${datum.name} = None
-% endfor
+    ## @var my_player_id
+    #  @breif The player_id of the competitor.
+    my_player_id = 0
 
-    #MODELS
+% for datum in globals:
+    ## @var ${datum.name}
+% if datum.doc:
+    #  @brief ${datum.doc}
+% endif
+    ${datum.name} = None
+
+% endfor
 
 % for model in models:
 %   if model.type == "Model":
+    ## @var ${lowercase(model.plural)}
+    #  @brief List containing all ${model.plural}.
     ${lowercase(model.plural)} = []
+
 %   endif
 % endfor
 
-    #GLOBALS ACCESSORS
 % for datum in globals:
-    #${datum.name}
-    #${datum.doc}
+    ## @fn get_${datum.name}
+    #  @breif Accessor function for ${datum.name}
     def get_${datum.name}(self):
         return self.${datum.name}
+
 % endfor
 
