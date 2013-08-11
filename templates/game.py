@@ -9,6 +9,12 @@ import utility
 import socket
 
 
+class GameOverException(Exception):
+    def __init__(self, winner, reason):
+        Exception.__init__(self)
+        self.winner = winner
+        self.reason = reason
+
 class Game:
 
     def __init__(self, conn, addr, port, name):
@@ -40,6 +46,8 @@ class Game:
             self.update_game(message)
         elif message['type'] == 'player_id':
             self.ai.my_player_id = message['args']['id']
+        elif message['type'] == 'game_over':
+            raise GameOverException(message["args"]["winner"], message["args"]["reason"])
         return message
 
     def wait_for(self, *types):
@@ -203,7 +211,18 @@ class Game:
         if not self.recv_player_id(): return False
 
         if not self.init_main(): return False
-        if not self.main_loop(): return False
+        try:
+            self.main_loop()
+        except GameOverException as e:
+            if e.winner == self.ai.my_player_id:
+                game_over_message = "You Win! - {reason}".format(reason=e.reason)
+            else:
+                game_over_message = "You Lose! - {reason}".format(reason=e.reason)
+        else:
+            game_over_message = "Game over was never reached."
+
         if not self.end_main(): return False
+        print(game_over_message)
+
         if not self.get_log(): return False
         
