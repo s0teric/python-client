@@ -4,7 +4,6 @@ from base_ai import BaseAI
 ## @class AI
 #  @brief Class to implement competitor code
 
-
 class AI(BaseAI):
     username = "Shell AI"
     password = "password"
