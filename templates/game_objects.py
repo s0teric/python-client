@@ -10,8 +10,11 @@ class GameObject():
 
 % for model in models:
 
-#${model.name}
-#${model.doc}
+#\
+# @class ${model.name}
+% if model.doc:
+#  @breif ${model.doc}
+% endif
 % if model.parent:
 class ${model.name}(${model.parent.name}):
 % else:
@@ -32,8 +35,15 @@ class ${model.name}(GameObject):
 
     #MODEL FUNCTIONS
 %   for func in model.functions + model.properties:
-    #${func.name}
-    #${func.doc}
+    #\
+# @fn ${func.name}
+% if func.doc:
+    #  @breif ${func.doc}
+% endif
+% for args in func.arguments:
+% if args.doc:
+    #  @param ${args.name} ${args.doc}
+% endfor
     def ${func.name}(self\
 % for args in func.arguments:
 , ${args.name}\
@@ -68,12 +78,16 @@ class ${model.name}(GameObject):
 %   endfor
 
     #MODEL DATUM ACCESSORS
-%   for datum in model.data:
-    #${datum.name}
-    #${datum.doc}
+% for datum in model.data:
+    #\
+    # @fn get_${datum.name}
+    #  @breif Accessor function for {datum.name}
+% if datum.doc:
+    #  ${datum.doc}
+% endif
     def get_${datum.name}(self):
         return ${datum.name}
-%   endfor
+% endfor
 
 
 % endfor
