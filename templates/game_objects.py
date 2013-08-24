@@ -80,12 +80,20 @@ class ${model.name}(GameObject):
 
     #MODEL DATUM ACCESSORS
 % for datum in model.data:
+% if datum.through:
     #\
-# @fn get_${datum.name}
+#  @fn get_${datum.name}
+    #  @breif Accessor function for ${datum.name} through ${datum.through}
+    def get_${datum.name}(self):
+        if self.${through}
+        return self.${through}.${datum.name}
+% else
+    #\
+#  @fn get_${datum.name}
     #  @breif Accessor function for ${datum.name}
     def get_${datum.name}(self):
         return ${datum.name}
-
+% endif
 % endfor
 
 
