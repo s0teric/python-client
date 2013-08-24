@@ -10,18 +10,18 @@ class AI(BaseAI):
     password = "password"
 
     #\
-    # @fn init
+# @fn init
     #  @breif Initialization function that is ran before the game begins.
     def init(self):
         pass
     #\
-    # @fn end
+# @fn end
     #  @breif Ending function that is ran after the game ends.
     def end(self):
         pass
 
     #\
-    # @fn run
+# @fn run
     #  @breif Function is ran for each turn.
     def run(self):
         pass

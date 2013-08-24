@@ -43,6 +43,7 @@ class ${model.name}(GameObject):
 % for args in func.arguments:
 % if args.doc:
     #  @param ${args.name} ${args.doc}
+% endif
 % endfor
     def ${func.name}(self\
 % for args in func.arguments:
@@ -80,7 +81,7 @@ class ${model.name}(GameObject):
     #MODEL DATUM ACCESSORS
 % for datum in model.data:
     #\
-    # @fn get_${datum.name}
+# @fn get_${datum.name}
     #  @breif Accessor function for {datum.name}
 % if datum.doc:
     #  ${datum.doc}
