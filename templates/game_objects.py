@@ -82,12 +82,10 @@ class ${model.name}(GameObject):
 % for datum in model.data:
     #\
 # @fn get_${datum.name}
-    #  @breif Accessor function for {datum.name}
-% if datum.doc:
-    #  ${datum.doc}
-% endif
+    #  @breif Accessor function for ${datum.name}
     def get_${datum.name}(self):
         return ${datum.name}
+
 % endfor
 
 
