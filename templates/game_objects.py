@@ -1,9 +1,10 @@
 # -*- python -*-
 
+import operator
 import utility
 import json
 import client_json
-
+import game
 
 class GameObject():
     def __init__(self):
@@ -11,6 +12,7 @@ class GameObject():
 
 ##
 ## S 1 FOR MODEL IN MODELS ---------------------------------------------------------------------------------- model
+
 % for model in models:
 
 #\
@@ -34,12 +36,12 @@ class ${model.name}(GameObject):
 ):
 ## E 2 FOR DATA IN MODEL
 ##
-        self.connection = connection
-        self.parent_game = parent_game
+        self._connection = connection
+        self._parent_game = parent_game
 ##
 ## S 2 FOR DATA IN MODEL
 % for datum in model.data:
-        self.${datum.name} = ${datum.name}
+        self._${datum.name} = ${datum.name}
 % endfor
 ## E 2 FOR DATA IN MODEL
 ##
@@ -104,27 +106,37 @@ class ${model.name}(GameObject):
 ##
 
 ##
-## S 2 FOR DATUM IN DATA ------------------------------------------------------------------------------------ datum
-## ------------------------------------------------------------------ model.get_${datum.name}()
-% for datum in model.data:
-% if datum.through:
-    #\
-#  @fn get_${datum.name}
-    #  @brief Accessor function for ${datum.name} through ${datum.through}
-    def get_${datum.name}(self):
-        if self.${through}
-        return self.${through}.${datum.name}
-% else:
-    #\
-#  @fn get_${datum.name}
-    #  @brief Accessor function for ${datum.name}
-    def get_${datum.name}(self):
-        return self.${datum.name}
-% endif
+## S 2 FOR LOCALS IN LOCALS
+% for local in model.locals:
+% if local.through:
+    ##Through data type
+    @property
+    def ${local.name}(self)
+        return self.${local.through}.${local.name}
 
+
+% else:
+    ##Primitive data type
+    @property
+    def ${local.name}(self):
+        return self._${local.name}
+
+%endif
 % endfor
-## E 2 FOR DATUM IN DATA ------------------------------------------------------------------------------------ datum
+## E 2 FOR LOCALS IN LOCALS
 ##
+
+##
+## S 2 FOR REMOTES IN REMOTES
+% for remote in model.remotes:
+    ## Return the model with remote_id in the list of models
+    @property
+    def ${remote.name}(self):
+        return parent_game.ai.${lowercase(remote.plural)}.find(self.${remote.name}_id, key=operator.attrgetter("id"))
+% endfor
+## E 2 FOR REMOTES IN REMOTES
+##
+
 % endfor
 ## E 1 FOR MODEL IN MODELS ---------------------------------------------------------------------------------- model
 ##
