@@ -184,7 +184,7 @@ class Game:
         values = change.get("values")
 % for model in models:
 % if model.type == "Model":
-        for ${lowercase(model.name)} in ${lowercase(model.plural)}:
+        for ${lowercase(model.name)} in self.ai.${lowercase(model.plural)}:
             if ${lowercase(model.name)}.id == change_id:
                 ${lowercase(model.name)}.__dict__.update(values)
                 return True
