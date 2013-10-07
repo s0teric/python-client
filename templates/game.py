@@ -184,13 +184,10 @@ class Game:
         values = change.get("values")
 % for model in models:
 % if model.type == "Model":
-        try:
-            index = self.ai.${lowercase(model.plural)}.find(change_id, key=operator.attrgetter('id'))
-        except:
-            pass
-        else:
-            self.ai.${lowercase(model.plural)}[index].__dict__.update(values)
-            return True
+        for ${lowercase(model.name)} in ${lowercase(model.plural)}:
+            if ${lowercase(model.name)}.id == change_id:
+                ${lowercase(model.name)}.__dict__.update(values)
+                return True
 % endif
 % endfor
         return False
