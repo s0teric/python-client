@@ -170,13 +170,10 @@ class Game:
         remove_id = change.get("id")
 % for model in models:
 % if model.type == "Model":
-        try:
-            index = self.ai.${lowercase(model.plural)}.find(remove_id, key=operator.attrgetter('id'))
-        except:
-            pass
-        else:
-            self.ai.${lowercase(model.plural)}.remove(index)
-            return True
+        for ${lowercase(model.name)} in self.ai.${lowercase(model.plural)}:
+            if ${lowercase(model.name)}.id == remove_id:
+                self.ai.${lowercase(model.plural)}.remove(${lowercase(model.name)})
+                return True
 % endif
 % endfor
         return False
