@@ -60,7 +60,6 @@ class Game:
     def login(self):
         login_json = client_json.login.copy()
         login_json['args']['username'] = self.ai.username
-        login_json['args']['password'] = self.ai.password
 
         utility.send_string(self.serv_conn, json.dumps(login_json))
 

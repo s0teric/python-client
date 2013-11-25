@@ -7,7 +7,6 @@ from base_ai import BaseAI
 
 class AI(BaseAI):
     username = "Shell AI"
-    password = "password"
 
     #\
 # @fn init
