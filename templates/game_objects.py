@@ -98,7 +98,7 @@ class ${model.name}(GameObject):
                 received_status = True
                 status = False
             if message.get("type") == "changes":
-                self.parent_game.update_game(message)
+                self._parent_game.update_game(message)
 
         return status
 % endfor
