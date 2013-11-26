@@ -83,12 +83,12 @@ class ${model.name}(GameObject):
 ## E 3 FOR ARGS IN FUNC
 ##
 
-        utility.send_string(self.connection, json.dumps(function_call))
+        utility.send_string(self._connection, json.dumps(function_call))
 
         received_status = False
         status = None
         while not received_status:
-            message = utility.receive_string(self.connection)
+            message = utility.receive_string(self._connection)
             message = json.loads(message)
 
             if message.get("type") == "success":
