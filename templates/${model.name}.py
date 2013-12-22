@@ -1,19 +1,9 @@
-# -*- python -*-
-
 import operator
 import utility
 import json
 import client_json
 import game
-
-class GameObject():
-    def __init__(self):
-        pass
-
-##
-## S 1 FOR MODEL IN MODELS ---------------------------------------------------------------------------------- model
-
-% for model in models:
+import game_object
 
 #\
 # @class ${model.name}
@@ -24,7 +14,7 @@ class GameObject():
 % if model.parent:
 class ${model.name}(${model.parent.name}):
 % else:
-class ${model.name}(GameObject):
+class ${model.name}(game_object.GameObject):
 % endif
 
 ## ------------------------------------------------------------------ model.__init__()
@@ -137,6 +127,3 @@ class ${model.name}(GameObject):
 ## E 2 FOR REMOTES IN REMOTES
 ##
 
-% endfor
-## E 1 FOR MODEL IN MODELS ---------------------------------------------------------------------------------- model
-##
