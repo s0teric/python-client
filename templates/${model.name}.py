@@ -1,3 +1,7 @@
+<%
+    rerun_for('model', models)
+%>
+
 import operator
 import utility
 import json
