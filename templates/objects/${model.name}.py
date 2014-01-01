@@ -41,7 +41,7 @@ class ${model.name}(game_object.GameObject):
 ##
 ## S 2 FOR FUNC IN FUNCTIONS -------------------------------------------------------------------------------- func
 ## ------------------------------------------------------------------ model.$(func.name}(${func.args})
-%   for func in model.functions + model.properties:
+%   for func in model.functions:
     #\
 # @fn ${func.name}
 % if func.doc:
@@ -100,32 +100,32 @@ class ${model.name}(game_object.GameObject):
 ##
 ## S 2 FOR LOCALS IN LOCALS
 % for local in model.locals:
-% if local.through:
     ##Through data type
     @property
     def ${local.name}(self)
-        return self.${local.through}.${local.name}
-
-
-% else:
-    ##Primitive data type
-    @property
-    def ${local.name}(self):
-        return self._${local.name}
-
-%endif
+        return self.${local.name}
 % endfor
 ## E 2 FOR LOCALS IN LOCALS
+
+
+## S 2 FOR REMOTES IN REMOTES
+% for remote in model.remotes:
+    ##Primitive data type
+    @property
+    def ${remote.name}(self):
+        return self.${remote.through}.${remote.name}
+% endfor
+## E 2 FOR REMOTES IN REMOTES
 ##
 
 ##
-## S 2 FOR REMOTES IN REMOTES
-% for remote in model.remotes:
-    ## Return the model with remote_id in the list of models
+## S 2 FOR RELATION IN RELATIONS
+% for relation in model.relations:
+    ## Return the model with relation_id in the list of models
     @property
-    def ${remote.name}(self):
-        return parent_game.ai.${lowercase(remote.plural)}.find(self.${remote.name}_id, key=operator.attrgetter("id"))
+    def ${relation.name}(self):
+        return parent_game.ai.${lowercase(relation.type.plural)}.find(self.${relation.name}_id, key=operator.attrgetter("id"))
 % endfor
-## E 2 FOR REMOTES IN REMOTES
+## E 2 FOR RELATION IN RELATIONS
 ##
 
