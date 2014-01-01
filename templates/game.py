@@ -6,11 +6,7 @@ import sys
 import operator
 import utility
 import socket
-
-% for model in models:
-from ${model.name} import ${model.name}
-% endfor
-
+import objects
 
 class GameOverException(Exception):
     def __init__(self, winner, reason):
@@ -157,7 +153,7 @@ class Game:
 % for model in models:
 % if model.type == "Model":
         if change.get("type") == "${model.name}":
-            temp = ${model.name}(connection=self.serv_conn, parent_game=self\
+            temp = objects.${model.name}(connection=self.serv_conn, parent_game=self\
 % for datum in model.data:
 , ${datum.name}=values.get("${datum.name}")\
 % endfor
