@@ -1,6 +1,4 @@
-<%
-    rerun_for('model', models)
-%>
+%    rerun_for('model', models)
 
 import operator
 import utility
