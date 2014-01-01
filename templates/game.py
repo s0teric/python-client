@@ -6,7 +6,9 @@ import sys
 import operator
 import utility
 import socket
-import objects
+% for model in models:
+from ${model.name} import ${model.name}
+% endfor
 
 class GameOverException(Exception):
     def __init__(self, winner, reason):

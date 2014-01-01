@@ -8,7 +8,7 @@ import json
 import game
 from game_object import GameObject
 % if model.parent:
-from .${model.parent.name} import ${model.parent.name}
+from ${model.parent.name} import ${model.parent.name}
 % endif
 
 #\

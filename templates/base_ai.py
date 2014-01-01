@@ -1,6 +1,8 @@
 # -*- python -*-
 import socket
-import objects
+% for model in models:
+from ${model.name} import ${model.name}
+% endfor
 
 #\
 # @class BaseAI
