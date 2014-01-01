@@ -6,11 +6,9 @@ import json
 import client_json
 import game
 from game_object import GameObject
-% for model1 in models:
-% if model1.name != model.name:
-from .${model.name} import ${model.name}
+% if model.parent:
+from ${model.parent.name} import ${model.parent.name}
 % endif
-% endfor
 
 #\
 # @class ${model.name}
