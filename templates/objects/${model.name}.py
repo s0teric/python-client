@@ -5,9 +5,9 @@ import utility
 import json
 import client_json
 import game
-from .game_object import GameObject
+from game_object import GameObject
 % for model in models:
-from .${model.name} import ${model.name}
+from ${model.name} import ${model.name}
 % endfor
 
 #\
