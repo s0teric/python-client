@@ -5,7 +5,10 @@ import utility
 import json
 import client_json
 import game
-import game_object
+from game_object import GameObject
+% for model in models:
+from . import ${model.name}
+% endfor
 
 #\
 # @class ${model.name}
@@ -16,7 +19,7 @@ import game_object
 % if model.parent:
 class ${model.name}(${model.parent.name}):
 % else:
-class ${model.name}(game_object.GameObject):
+class ${model.name}(GameObject):
 % endif
 
 ## ------------------------------------------------------------------ model.__init__()
