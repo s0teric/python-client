@@ -1,6 +1,6 @@
-%    rerun_for('model', models)
-
-import operator
+<%
+    rerun_for('model', models)
+%>import operator
 import utility
 import json
 import client_json
