@@ -1,6 +1,6 @@
 # -*- python -*-
 import socket
-from objects import *
+import objects
 
 #\
 # @class BaseAI
