@@ -107,7 +107,7 @@ class ${model.name}(GameObject):
     ##Through data type
     @property
     def ${local.name}(self):
-        return self.${local.name}
+        return self._${local.name}
 % endfor
 ## E 2 FOR LOCALS IN LOCALS
 
